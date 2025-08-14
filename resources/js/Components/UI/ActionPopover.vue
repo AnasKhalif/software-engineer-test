@@ -16,6 +16,28 @@
                     <button
                         type="button"
                         class="group flex w-full items-center gap-4 rounded-md px-2 py-3 text-[13px] font-medium text-[#2545AE] hover:bg-[#F1F5FF]"
+                        @click="$emit('detail')"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path
+                                d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6"
+                            />
+                            <circle cx="12" cy="12" r="3.5" />
+                        </svg>
+                        <span>Detail Produk</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="group flex w-full items-center gap-4 rounded-md px-2 py-3 text-[13px] font-medium text-[#2545AE] hover:bg-[#F1F5FF]"
                         @click="$emit('delete')"
                     >
                         <img
@@ -48,5 +70,5 @@ defineProps({
     open: Boolean,
     position: { type: Object, default: () => ({ top: 0, left: 0 }) },
 });
-defineEmits(["delete", "edit"]);
+defineEmits(["detail", "delete", "edit"]);
 </script>
