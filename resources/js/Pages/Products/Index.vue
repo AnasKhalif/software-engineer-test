@@ -14,6 +14,7 @@
                 <BaseButton
                     variant="primary"
                     class="self-start sm:self-auto w-auto"
+                    @click="router.get('/products/create')"
                 >
                     <svg
                         class="w-4 h-4"
@@ -37,8 +38,8 @@
                     <thead class="bg-[#E3E7F4]">
                         <tr>
                             <th class="rounded-tl-lg">Nama Produk</th>
-                            <th>Varian</th>
-                            <th>Tipe Produk</th>
+                            <th>SKU</th>
+                            <th>Stok</th>
                             <th>Kategori</th>
                             <th>Harga Jual</th>
                             <th>Waktu Dibuat</th>
@@ -67,8 +68,8 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>{{ p.variants }}</td>
-                            <td>{{ p.type }}</td>
+                            <td>{{ p.code }}</td>
+                            <td>{{ p.stock }}</td>
                             <td>
                                 <span class="badge">{{ p.category }}</span>
                             </td>
@@ -106,6 +107,8 @@
             >
                 <button
                     class="h-8 w-8 flex items-center justify-center rounded-md text-slate-400 border border-slate-200 hover:bg-slate-50"
+                    @click="goToPage(currentPage - 1)"
+                    :disabled="!hasPrev"
                 >
                     <svg
                         class="w-3.5 h-3.5"
@@ -121,24 +124,40 @@
                         />
                     </svg>
                 </button>
+
                 <button
                     class="h-8 min-w-8 px-3 rounded-md text-[12px] font-medium text-white bg-primary-500 border border-primary-500"
+                    @click="goToPage(currentPage)"
                 >
-                    1
+                    {{ currentPage }}
                 </button>
+
                 <button
+                    v-if="hasNext"
                     class="h-8 min-w-8 px-3 rounded-md text-[12px] font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50"
+                    @click="goToPage(nextPage)"
                 >
-                    2
+                    {{ nextPage }}
                 </button>
-                <span class="px-2 text-slate-400 text-[12px]">...</span>
+
+                <span
+                    v-if="showEllipsis"
+                    class="px-2 text-slate-400 text-[12px]"
+                    >...</span
+                >
+
                 <button
+                    v-if="showLast"
                     class="h-8 min-w-8 px-3 rounded-md text-[12px] font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50"
+                    @click="goToPage(lastPage)"
                 >
-                    15
+                    {{ lastPage }}
                 </button>
+
                 <button
                     class="h-8 w-8 flex items-center justify-center rounded-md text-slate-600 border border-slate-200 hover:bg-slate-50"
+                    @click="goToPage(currentPage + 1)"
+                    :disabled="!hasNext"
                 >
                     <svg
                         class="w-3.5 h-3.5"
@@ -160,6 +179,7 @@
         <ActionPopover
             :open="popover.open"
             :position="popover.position"
+            @detail="viewDetail"
             @delete="askDelete"
             @edit="editProduct"
         />
@@ -179,22 +199,47 @@ import BaseButton from "@/Components/UI/BaseButton.vue";
 import BaseSwitch from "@/Components/UI/BaseSwitch.vue";
 import ActionPopover from "@/Components/UI/ActionPopover.vue";
 import DeleteModal from "@/Components/UI/DeleteModal.vue";
-import { reactive } from "vue";
+import { computed, reactive } from "vue";
+import { router } from "@inertiajs/vue3";
 
-const products = reactive([
-    {
-        id: 1,
-        name: "Sound Effect",
-        code: "SND-EFCT",
-        variants: 1,
-        type: "Digital",
-        category: "Audio",
-        price: "Rp 18,000 - Rp 32,000",
-        created_at: "27 Mei 2025",
-        active: true,
-        image: "https://dummyimage.com/96x96/3139d8/ffffff&text=SFX",
+const props = defineProps({
+    products: { type: Array, default: () => [] },
+    pagination: {
+        type: Object,
+        default: () => ({
+            current_page: 1,
+            last_page: 1,
+            per_page: 10,
+            total: 0,
+        }),
     },
-]);
+});
+
+const products = computed(() => props.products);
+
+const currentPage = computed(() => props.pagination.current_page || 1);
+const lastPage = computed(() => props.pagination.last_page || 1);
+const hasPrev = computed(() => currentPage.value > 1);
+const hasNext = computed(() => currentPage.value < lastPage.value);
+const nextPage = computed(() =>
+    Math.min(currentPage.value + 1, lastPage.value)
+);
+
+// Ellipsis hanya muncul jika ada jarak > 1 halaman antara next dan last
+const showEllipsis = computed(() => lastPage.value > nextPage.value + 1);
+// Tampilkan tombol last hanya jika masih ada halaman setelah next
+const showLast = computed(() => lastPage.value > nextPage.value);
+
+function goToPage(page) {
+    if (
+        !page ||
+        page < 1 ||
+        page > lastPage.value ||
+        page === currentPage.value
+    )
+        return;
+    router.get("/", { page }, { preserveScroll: true, preserveState: true });
+}
 
 const popover = reactive({
     open: false,
@@ -206,7 +251,6 @@ function openPopover(e, product) {
     const r = e.currentTarget.getBoundingClientRect();
     const w = 200,
         h = 140;
-    // If already open on same product, toggle close
     if (popover.open && popover.product?.id === product.id) {
         popover.open = false;
         return;
@@ -235,15 +279,31 @@ const deleteModal = reactive({
 function askDelete() {
     deleteModal.open = true;
     deleteModal.productName = popover.product?.name || "";
-    deleteModal.productId = popover.product?.id;
+    deleteModal.productId = popover.product?.id || null;
     popover.open = false;
 }
 function confirmDelete() {
-    console.log("Hapus produk id:", deleteModal.productId);
-    deleteModal.open = false;
+    if (!deleteModal.productId) return;
+    router.delete(`/products/${deleteModal.productId}`, {
+        preserveScroll: true,
+        onFinish: () => {
+            deleteModal.open = false;
+        },
+    });
 }
 function editProduct() {
-    console.log("Edit produk id:", popover.product?.id);
+    if (!popover.product?.id) return;
+    router.get(
+        `/products/${popover.product.id}/edit`,
+        {},
+        { preserveScroll: true }
+    );
+    popover.open = false;
+}
+
+function viewDetail() {
+    if (!popover.product?.id) return;
+    router.get(`/products/${popover.product.id}`);
     popover.open = false;
 }
 </script>

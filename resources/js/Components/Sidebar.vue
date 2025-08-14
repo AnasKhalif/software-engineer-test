@@ -114,8 +114,9 @@
                     class="flex flex-col gap-1 mt-1"
                 >
                     <a
-                        href="#"
+                        href="/"
                         class="sidebar-menu-item w-full h-9 flex items-center gap-3 px-2 rounded-[4px] bg-[#2545AE] text-white text-[13px] font-semibold hover:bg-[#1f3d97]"
+                        @click="closeMobile"
                     >
                         <img
                             src="/public/icons/list-ul.png"
@@ -151,7 +152,6 @@ const { state, toggleCollapse, toggleProdukSubmenu, closeMobile } =
 
 <style scoped>
 @media (max-width: 767px) {
-    /* Off-canvas behavior so content uses full width on mobile */
     #sidebar {
         position: fixed;
         top: 0;
@@ -163,7 +163,6 @@ const { state, toggleCollapse, toggleProdukSubmenu, closeMobile } =
     #sidebar.mobile-open {
         transform: translateX(0);
     }
-    /* Hide desktop collapse controls on mobile */
     #sidebar .collapse-wrapper {
         display: none;
     }
