@@ -22,6 +22,10 @@
 
 ![Mobile View](public/doc/mobile.jpeg)
 
+### Sidebar Mobile
+
+![Mobile View](public/doc/sidebar_mobile.jpeg)
+
 ## Deskripsi Proyek
 
 Proyek ini mengimplementasikan slicing UI dan fitur CRUD penuh untuk entitas Produk menggunakan Laravel 11 (PHP 8+), Inertia.js, Vue 3, Tailwind CSS, dan MongoDB sebagai database non-relasional.
