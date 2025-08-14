@@ -10,7 +10,7 @@
 
 ![Create Product](public/doc/create.jpeg)
 
-### Modal Konfirmasi
+### Modal
 
 ![Modal](public/doc/modal.jpeg)
 
