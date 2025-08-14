@@ -1,5 +1,29 @@
 ## TES TEKNIKAL SOFTWARE ENGINEER – CRUD Produk (Laravel 11 + Inertia.js + Vue 3 + MongoDB)
 
+## Screenshots
+
+### Halaman Utama
+
+![Index](public/doc/index.jpeg)
+
+### Halaman Create Produk
+
+![Create Product](public/doc/create.jpeg)
+
+### Modal Konfirmasi
+
+![Modal](public/doc/modal.jpeg)
+
+### Modal Delete Konfirmasi
+
+![Modal Delete](public/doc/modal_delete.jpeg)
+
+### Tampilan Mobile
+
+![Mobile View](public/doc/mobile.jpeg)
+
+## Deskripsi Proyek
+
 Proyek ini mengimplementasikan slicing UI dan fitur CRUD penuh untuk entitas Produk menggunakan Laravel 11 (PHP 8+), Inertia.js, Vue 3, Tailwind CSS, dan MongoDB sebagai database non-relasional.
 
 ## Fitur Utama
